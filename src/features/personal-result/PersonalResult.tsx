@@ -12,8 +12,10 @@ import { ContextRoutingPanel } from "../../components/ui/ContextRoutingPanel";
 import { LocalContactPanel } from "../../components/ui/LocalContactPanel";
 import { PrivacyPreviewPanel } from "../../components/ui/PrivacyPreviewPanel";
 import { SignalBadge } from "../../components/ui/SignalBadge";
+import { SignalTracePanel } from "../../components/ui/SignalTracePanel";
 import { SectionHeader } from "../../components/ui/SectionHeader";
 import { getContactsForContext } from "../../data/arizonaContacts";
+import { pimaZones } from "../../data/mockTrends";
 import { signalDescriptions } from "../../lib/signal";
 import type { PersonalRiskResult, UserReport } from "../../types/domain";
 
@@ -25,6 +27,8 @@ interface PersonalResultProps {
 
 export function PersonalResult({ report, result, onOpenCalmConnect }: PersonalResultProps) {
   const contacts = getContactsForContext(report.zoneId, report.exposureTypes);
+  const zoneName =
+    pimaZones.find((zone) => zone.id === report.zoneId)?.name ?? "Selected Arizona zone";
   const epydemixRole = result.epydemix.relevance === "primary" ? "promoted" : "checked only";
   const fallbackItems = [
     result.explanationSource === "Mock AI" ? "Gemini explanation API failed or is not configured." : undefined,
@@ -118,6 +122,8 @@ export function PersonalResult({ report, result, onOpenCalmConnect }: PersonalRe
       </div>
 
       <PrivacyPreviewPanel report={report} />
+
+      <SignalTracePanel report={report} risk={result} zoneName={zoneName} />
 
       <ContextRoutingPanel report={report} risk={result} />
 

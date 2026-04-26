@@ -1009,6 +1009,112 @@ button:focus-visible {
   line-height: 1.55;
 }
 
+.signal-trace {
+  display: grid;
+  gap: 16px;
+  margin: 18px 0;
+  padding: 18px;
+  border: 1px solid #cde3dc;
+  border-radius: 8px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.98), rgba(237, 246, 243, 0.74)),
+    var(--surface);
+  box-shadow: var(--shadow-soft);
+}
+
+.signal-trace--compact {
+  padding: 16px;
+}
+
+.signal-trace__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.signal-trace__header h3 {
+  margin: 6px 0;
+  font-size: 1.14rem;
+}
+
+.signal-trace__header p {
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.signal-trace__score {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 40px;
+  padding: 9px 11px;
+  border: 1px solid #cde3dc;
+  border-radius: 8px;
+  background: var(--surface);
+  color: var(--primary-strong);
+  font-size: 0.86rem;
+  font-weight: 850;
+  white-space: nowrap;
+}
+
+.signal-trace-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.signal-trace--compact .signal-trace-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.signal-trace-grid article {
+  display: grid;
+  gap: 7px;
+  min-height: 168px;
+  padding: 13px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.76);
+}
+
+.signal-trace-grid svg {
+  color: var(--primary-strong);
+}
+
+.signal-trace-grid span,
+.signal-trace-sources span {
+  color: var(--primary-strong);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.signal-trace-grid strong {
+  font-size: 0.95rem;
+  line-height: 1.35;
+}
+
+.signal-trace-grid p {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.signal-trace-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 2px;
+}
+
+.signal-trace-sources span {
+  min-height: 30px;
+  padding: 6px 9px;
+  border-radius: 8px;
+  background: var(--soft-teal);
+}
+
 .step-list {
   display: grid;
   gap: 8px;
@@ -3098,6 +3204,7 @@ button:focus-visible {
     .review-lead-time,
     .home-intelligence-strip,
     .intake-boundary,
+    .signal-trace-grid,
     .flow-meter {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -3127,6 +3234,10 @@ button:focus-visible {
   }
 
   .privacy-preview__header {
+    display: grid;
+  }
+
+  .signal-trace__header {
     display: grid;
   }
 
@@ -3174,6 +3285,8 @@ button:focus-visible {
     .review-lead-time,
     .home-intelligence-strip,
     .intake-boundary,
+    .signal-trace-grid,
+    .signal-trace--compact .signal-trace-grid,
     .flow-meter {
     grid-template-columns: 1fr;
   }

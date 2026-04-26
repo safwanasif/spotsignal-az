@@ -5,6 +5,7 @@ import { MetricCard } from "../../components/ui/MetricCard";
 import { SignalBadge } from "../../components/ui/SignalBadge";
 import { SectionHeader } from "../../components/ui/SectionHeader";
 import { SignalIntegrityPanel } from "../../components/ui/SignalIntegrityPanel";
+import { SignalTracePanel } from "../../components/ui/SignalTracePanel";
 import { communityTrends } from "../../data/mockTrends";
 import { getPlaceById } from "../../data/places";
 import { formatPercent } from "../../lib/signal";
@@ -88,7 +89,7 @@ function buildDashboardSummary(
   if (report.exposureTypes.includes("Outdoor/vector")) {
     return {
       title: `${zoneName} outdoor/vector-like reports are being watched.`,
-      body: `${place.label} is a ${place.type.toLowerCase()} context. The latest report includes ${symptoms}, ${report.imageCategory}, and ${exposures}. Weather/vector context is promoted, while contact matrices remain supporting or background evidence. The strongest current pattern is ${trend.strongestPattern}.`
+      body: `${place.label} is a ${place.type.toLowerCase()} context. The latest report includes ${symptoms}, ${report.imageCategory}, and ${exposures}. Weather/vector context is promoted, while contact matrices remain supporting reference evidence. The strongest current pattern is ${trend.strongestPattern}.`
     };
   }
 
@@ -196,6 +197,8 @@ export function PublicHealthDashboard({ zones, report, risk }: PublicHealthDashb
       </div>
 
       <ContextRoutingPanel report={report} risk={risk} compact />
+
+      <SignalTracePanel report={report} risk={risk} zoneName={zoneName} compact />
 
       <SignalIntegrityPanel />
 
