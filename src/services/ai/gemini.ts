@@ -10,7 +10,7 @@ import type {
 } from "../../types/domain";
 
 const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models";
-const DEFAULT_GEMINI_MODEL = "gemini-3-flash-preview";
+const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash";
 const DEFAULT_GEMMA_MODEL = "gemma-4-31b-it";
 const allowedCategories: ImageCategory[] = [
   "bite-like mark",

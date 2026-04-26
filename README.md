@@ -76,7 +76,7 @@ Create a local `.env.local` file and add a Google AI Studio key:
 
 ```txt
 VITE_GEMINI_API_KEY=your_key_here
-VITE_GEMINI_MODEL=gemini-3-flash-preview
+VITE_GEMINI_MODEL=gemini-2.5-flash
 VITE_GEMMA_MODEL=gemma-4-31b-it
 ```
 
