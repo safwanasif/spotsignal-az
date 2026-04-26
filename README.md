@@ -70,7 +70,7 @@ The prototype now includes live adapters with mock fallback:
 - NOAA/National Weather Service API for forecast context by Arizona place coordinates.
 - Epydemix GitHub data for Arizona demographic structure and contact matrices by setting.
 
-Create `.env.local` from `.env.example` and add a Google AI Studio key:
+Create a local `.env.local` file and add a Google AI Studio key:
 
 ```txt
 VITE_GEMINI_API_KEY=your_key_here
