@@ -1,8 +1,10 @@
 import type {
   ImageCategory,
   LanguagePreference,
+  PatternTriage,
   PersonalRiskResult,
   SignalAudit,
+  SurveillancePattern,
   UserReport,
   WeatherContext
 } from "../../types/domain";
@@ -17,6 +19,15 @@ const allowedCategories: ImageCategory[] = [
   "sore/lesion-like mark",
   "swelling/redness",
   "unknown / needs review"
+];
+const allowedPatterns: SurveillancePattern[] = [
+  "vector-like",
+  "respiratory-close-contact",
+  "foodborne-like",
+  "travel-associated",
+  "one-health-animal-environment",
+  "heat-environmental",
+  "general-monitor"
 ];
 
 interface GeminiTextPart {
@@ -52,6 +63,14 @@ interface SignalAuditResponse {
   uncertainty?: string;
   missingData?: string;
   reviewerNextStep?: string;
+}
+
+interface PatternTriageResponse {
+  pattern?: SurveillancePattern;
+  confidence?: "low" | "medium" | "high";
+  routingReason?: string;
+  promotedContext?: string[];
+  reviewWindow?: "monitor" | "24h" | "48h";
 }
 
 function getApiKey(): string | undefined {
@@ -191,6 +210,7 @@ Report:
 - Privacy level: ${report.privacyLevel}
 - Signal level: ${risk.signalLevel}
 - Score: ${risk.score}
+- AI triage pattern: ${risk.aiTriage.pattern} (${risk.aiTriage.confidence})
 - Factors: ${risk.factors.map((factor) => factor.label).join(", ")}
 - Weather context: ${weather.summary}
 - Epydemix relevance: ${risk.epydemix.relevance}
@@ -203,6 +223,47 @@ Report:
   }
 
   return text;
+}
+
+export async function generatePatternTriageWithGemma(
+  report: UserReport,
+  weather: WeatherContext
+): Promise<PatternTriage> {
+  const text = await callGemini(
+    [
+      {
+        text: `You are Gemma inside SpotSignal AZ. Classify the incoming self-report packet into one surveillance routing pattern. This classification affects risk scoring and reviewer workflow, so be conservative. Return only JSON with keys pattern, confidence, routingReason, promotedContext, reviewWindow.
+
+Allowed patterns: vector-like, respiratory-close-contact, foodborne-like, travel-associated, one-health-animal-environment, heat-environmental, general-monitor.
+Allowed confidence: low, medium, high.
+Allowed reviewWindow: monitor, 24h, 48h.
+promotedContext must be 2 to 4 short strings.
+
+Report:
+- Symptoms: ${report.symptoms.join(", ")}
+- Place/exposure: ${report.exposureTypes.join(", ")}
+- Privacy: ${report.privacyLevel}
+- Image category: ${report.imageCategory} (${report.imageConfidence})
+- Weather: ${weather.summary}`
+      }
+    ],
+    getGemmaModel()
+  );
+
+  const parsed = parseJsonResponse<PatternTriageResponse>(text);
+
+  if (!parsed?.pattern || !allowedPatterns.includes(parsed.pattern)) {
+    throw new Error("Gemma returned an invalid triage pattern");
+  }
+
+  return {
+    source: "Gemma API",
+    pattern: parsed.pattern,
+    confidence: parsed.confidence ?? "low",
+    routingReason: parsed.routingReason ?? "Gemma routed this report using symptoms and exposure context.",
+    promotedContext: parsed.promotedContext?.slice(0, 4) ?? ["symptoms", "exposure context"],
+    reviewWindow: parsed.reviewWindow ?? "monitor"
+  };
 }
 
 export async function generateSignalAuditWithGemma(

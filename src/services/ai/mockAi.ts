@@ -1,6 +1,7 @@
 import type {
   ImageCategory,
   LanguagePreference,
+  PatternTriage,
   RiskFactor,
   SignalAudit,
   UserReport
@@ -68,5 +69,75 @@ export function buildSignalAudit(
     missingData,
     reviewerNextStep:
       "Keep the signal in human review, compare against partner data if the pattern repeats, and avoid public claims from a single report."
+  };
+}
+
+export function buildPatternTriage(report: UserReport): PatternTriage {
+  if (report.exposureTypes.includes("Outdoor/vector")) {
+    return {
+      source: "Mock AI",
+      pattern: "vector-like",
+      confidence: report.imageCategory === "bite-like mark" ? "medium" : "low",
+      routingReason: "Outdoor exposure plus bite/rash-style context routes this to vector and weather review.",
+      promotedContext: ["weather/vector", "nearby trend", "image category"],
+      reviewWindow: "24h"
+    };
+  }
+
+  if (report.exposureTypes.includes("Close-contact")) {
+    return {
+      source: "Mock AI",
+      pattern: "respiratory-close-contact",
+      confidence: report.symptoms.some((symptom) => ["Cough", "Sore throat", "Fatigue"].includes(symptom))
+        ? "medium"
+        : "low",
+      routingReason: "Close-contact setting routes this report to contact-pattern and shared-space review.",
+      promotedContext: ["Epydemix contact matrix", "shared setting", "symptom trend"],
+      reviewWindow: "48h"
+    };
+  }
+
+  if (report.exposureTypes.includes("Foodborne")) {
+    return {
+      source: "Mock AI",
+      pattern: "foodborne-like",
+      confidence: report.symptoms.some((symptom) => ["Nausea", "Vomiting", "Diarrhea"].includes(symptom))
+        ? "medium"
+        : "low",
+      routingReason: "Food setting plus stomach symptoms routes this to onset timing and clinic/inspection comparison.",
+      promotedContext: ["food setting", "onset timing", "clinic comparison"],
+      reviewWindow: "24h"
+    };
+  }
+
+  if (report.exposureTypes.includes("Travel-associated")) {
+    return {
+      source: "Mock AI",
+      pattern: "travel-associated",
+      confidence: "low",
+      routingReason: "Travel context routes this to CDC notices and future travel-pathway comparison.",
+      promotedContext: ["CDC travel notices", "transit context", "clinic comparison"],
+      reviewWindow: "48h"
+    };
+  }
+
+  if (report.exposureTypes.includes("Animal/zoonotic")) {
+    return {
+      source: "Mock AI",
+      pattern: "one-health-animal-environment",
+      confidence: "medium",
+      routingReason: "Animal or ranch context routes this to One Health partner-feed comparison.",
+      promotedContext: ["animal/environment context", "nearby trend", "partner feeds"],
+      reviewWindow: "48h"
+    };
+  }
+
+  return {
+    source: "Mock AI",
+    pattern: "general-monitor",
+    confidence: "low",
+    routingReason: "No specialized pathway dominates, so this stays in conservative monitoring.",
+    promotedContext: ["symptoms", "zone trend", "privacy level"],
+    reviewWindow: "monitor"
   };
 }

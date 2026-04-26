@@ -1060,7 +1060,7 @@ button:focus-visible {
 
 .signal-trace-grid {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 10px;
 }
 
@@ -1099,6 +1099,23 @@ button:focus-visible {
   color: var(--muted);
   font-size: 0.9rem;
   line-height: 1.5;
+}
+
+.triage-context-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.triage-context-list span {
+  min-height: 30px;
+  padding: 6px 9px;
+  border-radius: 8px;
+  background: var(--surface-soft);
+  color: var(--primary-strong);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
 }
 
 .gemma-audit {

@@ -1,6 +1,7 @@
 import {
   BrainCircuit,
   CalendarClock,
+  GitBranch,
   Image,
   MapPinned,
   SearchCheck,
@@ -41,6 +42,7 @@ export function SignalTracePanel({
     risk.epydemix.source,
     report.imageSource,
     risk.explanationSource,
+    risk.aiTriage.source,
     risk.aiAudit.source
   ];
   const uniqueSources = Array.from(new Set(contextSources));
@@ -96,11 +98,27 @@ export function SignalTracePanel({
           </p>
         </article>
         <article>
+          <GitBranch size={18} />
+          <span>LLM triage</span>
+          <strong>{risk.aiTriage.pattern}</strong>
+          <p>
+            {risk.aiTriage.confidence} confidence, {risk.aiTriage.reviewWindow} review window:
+            {" "}
+            {risk.aiTriage.routingReason}
+          </p>
+        </article>
+        <article>
           <ShieldCheck size={18} />
           <span>Guardrail</span>
           <strong>Human review before action</strong>
           <p>No diagnosis, no causation claim, and no outbreak declaration from AI alone.</p>
         </article>
+      </div>
+
+      <div className="triage-context-list" aria-label="Promoted context from AI triage">
+        {risk.aiTriage.promotedContext.map((item) => (
+          <span key={item}>{item}</span>
+        ))}
       </div>
 
       <div className="gemma-audit">

@@ -1,12 +1,19 @@
-import { classifyImage, buildRiskExplanation, buildSignalAudit } from "./mockAi";
+import {
+  classifyImage,
+  buildRiskExplanation,
+  buildSignalAudit,
+  buildPatternTriage
+} from "./mockAi";
 import {
   classifyImageWithGemini,
   generateRiskExplanationWithGemini,
+  generatePatternTriageWithGemma,
   generateSignalAuditWithGemma
 } from "./gemini";
 import type {
   ImageCategory,
   LanguagePreference,
+  PatternTriage,
   PersonalRiskResult,
   ReportFormValues,
   SignalAudit,
@@ -35,6 +42,18 @@ export async function classifyReportImage(values: ReportFormValues): Promise<{
     ...classifyImage(values.imageName),
     source: "Mock AI"
   };
+}
+
+export async function generatePatternTriage(
+  report: UserReport,
+  weather: WeatherContext
+): Promise<PatternTriage> {
+  try {
+    return await generatePatternTriageWithGemma(report, weather);
+  } catch (error) {
+    console.warn("Using mock Gemma triage fallback:", error);
+    return buildPatternTriage(report);
+  }
 }
 
 export async function generateRiskExplanation(

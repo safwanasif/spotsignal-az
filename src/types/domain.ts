@@ -139,6 +139,24 @@ export interface SignalAudit {
   reviewerNextStep: string;
 }
 
+export type SurveillancePattern =
+  | "vector-like"
+  | "respiratory-close-contact"
+  | "foodborne-like"
+  | "travel-associated"
+  | "one-health-animal-environment"
+  | "heat-environmental"
+  | "general-monitor";
+
+export interface PatternTriage {
+  source: "Gemma API" | "Mock AI";
+  pattern: SurveillancePattern;
+  confidence: "low" | "medium" | "high";
+  routingReason: string;
+  promotedContext: string[];
+  reviewWindow: "monitor" | "24h" | "48h";
+}
+
 export interface PersonalRiskResult {
   signalLevel: SignalLevel;
   score: number;
@@ -147,6 +165,7 @@ export interface PersonalRiskResult {
   nextSteps: string[];
   weather: WeatherContext;
   epydemix: EpydemixContext;
+  aiTriage: PatternTriage;
   aiAudit: SignalAudit;
   explanationSource: "Gemini API" | "Mock AI";
 }

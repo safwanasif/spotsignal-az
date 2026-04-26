@@ -67,6 +67,7 @@ spotsignal-az/
 The prototype now includes live adapters with mock fallback:
 
 - Gemini API for optional image categorization and calm risk explanations.
+- Gemma model triage pass for surveillance pattern routing, promoted context, confidence, and review window.
 - Gemma model audit pass for threshold reason, uncertainty, missing data, and reviewer next step when configured.
 - NOAA/National Weather Service API for forecast context by Arizona place coordinates.
 - Epydemix GitHub data for Arizona demographic structure and contact matrices by setting.

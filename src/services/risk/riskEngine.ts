@@ -1,8 +1,18 @@
 import { communityTrends } from "../../data/mockTrends";
 import { getPlaceById } from "../../data/places";
 import { scoreToSignal } from "../../lib/signal";
-import { generateRiskExplanation, classifyReportImage, generateSignalAudit } from "../ai/aiService";
-import { buildRiskExplanation, buildSignalAudit, classifyImage } from "../ai/mockAi";
+import {
+  generateRiskExplanation,
+  classifyReportImage,
+  generatePatternTriage,
+  generateSignalAudit
+} from "../ai/aiService";
+import {
+  buildRiskExplanation,
+  buildPatternTriage,
+  buildSignalAudit,
+  classifyImage
+} from "../ai/mockAi";
 import {
   getEpydemixContext,
   getLocalEpydemixFallback
@@ -12,6 +22,7 @@ import { getWeatherContextForPlace } from "../weather/weatherService";
 import type {
   EpydemixContext,
   GeoZone,
+  PatternTriage,
   PersonalRiskResult,
   ReportFormValues,
   RiskFactor,
@@ -54,12 +65,14 @@ export function calculatePersonalRisk(
   weatherOverride?: WeatherContext,
   epydemixOverride?: EpydemixContext,
   explanationOverride?: string,
-  explanationSource: PersonalRiskResult["explanationSource"] = "Mock AI"
+  explanationSource: PersonalRiskResult["explanationSource"] = "Mock AI",
+  triageOverride?: PatternTriage
 ): PersonalRiskResult {
   const trend = communityTrends.find((item) => item.zoneId === report.zoneId);
   const weather = weatherOverride ?? getWeatherContext(report.zoneId);
   const place = getPlaceById(report.placeId);
   const epydemix = epydemixOverride ?? getLocalEpydemixFallback(place.type);
+  const aiTriage = triageOverride ?? buildPatternTriage(report);
   const factors: RiskFactor[] = [];
 
   const symptomScore = Math.min(report.symptoms.length * 8, 32);
@@ -114,6 +127,14 @@ export function calculatePersonalRisk(
     });
   }
 
+  if (aiTriage.confidence !== "low") {
+    factors.push({
+      label: "AI pattern triage",
+      weight: aiTriage.confidence === "high" ? 12 : 8,
+      explanation: `${aiTriage.pattern} routing: ${aiTriage.routingReason}`
+    });
+  }
+
   const score = Math.min(
     factors.reduce((total, factor) => total + factor.weight, 0),
     100
@@ -131,6 +152,7 @@ export function calculatePersonalRisk(
     ],
     weather,
     epydemix,
+    aiTriage,
     aiAudit: buildSignalAudit(report, score, factors),
     explanationSource
   };
@@ -146,7 +168,15 @@ export async function buildRiskAssessment(values: ReportFormValues): Promise<{
     getWeatherContextForPlace(place),
     getEpydemixContext(place, report)
   ]);
-  const baseRisk = calculatePersonalRisk(report, weather, epydemix);
+  const aiTriage = await generatePatternTriage(report, weather);
+  const baseRisk = calculatePersonalRisk(
+    report,
+    weather,
+    epydemix,
+    undefined,
+    "Mock AI",
+    aiTriage
+  );
   const aiExplanation = await generateRiskExplanation(
     report,
     baseRisk,
