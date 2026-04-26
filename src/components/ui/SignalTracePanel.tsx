@@ -3,6 +3,7 @@ import {
   CalendarClock,
   Image,
   MapPinned,
+  SearchCheck,
   ShieldCheck,
   Sparkles
 } from "lucide-react";
@@ -39,7 +40,8 @@ export function SignalTracePanel({
     risk.weather.source,
     risk.epydemix.source,
     report.imageSource,
-    risk.explanationSource
+    risk.explanationSource,
+    risk.aiAudit.source
   ];
   const uniqueSources = Array.from(new Set(contextSources));
 
@@ -99,6 +101,34 @@ export function SignalTracePanel({
           <strong>Human review before action</strong>
           <p>No diagnosis, no causation claim, and no outbreak declaration from AI alone.</p>
         </article>
+      </div>
+
+      <div className="gemma-audit">
+        <div className="gemma-audit__header">
+          <SearchCheck size={19} />
+          <div>
+            <span>Gemma signal audit</span>
+            <strong>{risk.aiAudit.source}</strong>
+          </div>
+        </div>
+        <div className="gemma-audit-grid">
+          <article>
+            <span>Threshold reason</span>
+            <p>{risk.aiAudit.thresholdReason}</p>
+          </article>
+          <article>
+            <span>Uncertainty</span>
+            <p>{risk.aiAudit.uncertainty}</p>
+          </article>
+          <article>
+            <span>Missing data</span>
+            <p>{risk.aiAudit.missingData}</p>
+          </article>
+          <article>
+            <span>Reviewer next step</span>
+            <p>{risk.aiAudit.reviewerNextStep}</p>
+          </article>
+        </div>
       </div>
 
       {!compact ? (

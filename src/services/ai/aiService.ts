@@ -1,13 +1,15 @@
-import { classifyImage, buildRiskExplanation } from "./mockAi";
+import { classifyImage, buildRiskExplanation, buildSignalAudit } from "./mockAi";
 import {
   classifyImageWithGemini,
-  generateRiskExplanationWithGemini
+  generateRiskExplanationWithGemini,
+  generateSignalAuditWithGemma
 } from "./gemini";
 import type {
   ImageCategory,
   LanguagePreference,
   PersonalRiskResult,
   ReportFormValues,
+  SignalAudit,
   UserReport,
   WeatherContext
 } from "../../types/domain";
@@ -62,5 +64,17 @@ export async function generateRiskExplanation(
       explanation: buildRiskExplanation(report, language),
       source: "Mock AI"
     };
+  }
+}
+
+export async function generateSignalAudit(
+  report: UserReport,
+  risk: PersonalRiskResult
+): Promise<SignalAudit> {
+  try {
+    return await generateSignalAuditWithGemma(report, risk);
+  } catch (error) {
+    console.warn("Using mock Gemma audit fallback:", error);
+    return buildSignalAudit(report, risk.score, risk.factors);
   }
 }

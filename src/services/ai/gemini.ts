@@ -2,12 +2,14 @@ import type {
   ImageCategory,
   LanguagePreference,
   PersonalRiskResult,
+  SignalAudit,
   UserReport,
   WeatherContext
 } from "../../types/domain";
 
 const GEMINI_ENDPOINT = "https://generativelanguage.googleapis.com/v1beta/models";
 const DEFAULT_GEMINI_MODEL = "gemini-3-flash-preview";
+const DEFAULT_GEMMA_MODEL = "gemma-4-31b-it";
 const allowedCategories: ImageCategory[] = [
   "bite-like mark",
   "rash-like mark",
@@ -45,12 +47,23 @@ interface ImageClassificationResponse {
   confidence?: "low" | "medium" | "high";
 }
 
+interface SignalAuditResponse {
+  thresholdReason?: string;
+  uncertainty?: string;
+  missingData?: string;
+  reviewerNextStep?: string;
+}
+
 function getApiKey(): string | undefined {
   return import.meta.env.VITE_GEMINI_API_KEY;
 }
 
 function getModel(): string {
   return import.meta.env.VITE_GEMINI_MODEL ?? DEFAULT_GEMINI_MODEL;
+}
+
+function getGemmaModel(): string {
+  return import.meta.env.VITE_GEMMA_MODEL ?? DEFAULT_GEMMA_MODEL;
 }
 
 function readGeminiText(response: GeminiResponse): string {
@@ -84,14 +97,14 @@ function dataUrlToBase64(dataUrl?: string): string | undefined {
   return base64;
 }
 
-async function callGemini(parts: GeminiPart[]): Promise<string> {
+async function callGemini(parts: GeminiPart[], model = getModel()): Promise<string> {
   const apiKey = getApiKey();
 
   if (!apiKey) {
     throw new Error("Missing VITE_GEMINI_API_KEY");
   }
 
-  const response = await fetch(`${GEMINI_ENDPOINT}/${getModel()}:generateContent`, {
+  const response = await fetch(`${GEMINI_ENDPOINT}/${model}:generateContent`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -190,4 +203,55 @@ Report:
   }
 
   return text;
+}
+
+export async function generateSignalAuditWithGemma(
+  report: UserReport,
+  risk: PersonalRiskResult
+): Promise<SignalAudit> {
+  const text = await callGemini(
+    [
+      {
+        text: `You are the Gemma signal auditor inside SpotSignal AZ. Audit the AI-generated risk profile for a participatory surveillance prototype. Return only JSON with keys thresholdReason, uncertainty, missingData, reviewerNextStep. Keep each value under 24 words. Be conservative, non-diagnostic, and human-in-the-loop.
+
+Report:
+- Symptoms: ${report.symptoms.join(", ")}
+- Exposure types: ${report.exposureTypes.join(", ")}
+- Privacy level: ${report.privacyLevel}
+- Zone: ${report.zoneId}
+- Image category: ${report.imageCategory} (${report.imageConfidence})
+
+Risk profile:
+- Signal level: ${risk.signalLevel}
+- Score: ${risk.score}
+- Factors: ${risk.factors
+          .map((factor) => `${factor.label} ${factor.weight}pts`)
+          .join("; ")}
+- Weather source: ${risk.weather.source}
+- Weather summary: ${risk.weather.summary}
+- Epydemix relevance: ${risk.epydemix.relevance}
+- Epydemix summary: ${risk.epydemix.summary}`
+      }
+    ],
+    getGemmaModel()
+  );
+
+  const parsed = parseJsonResponse<SignalAuditResponse>(text);
+
+  if (
+    !parsed?.thresholdReason ||
+    !parsed.uncertainty ||
+    !parsed.missingData ||
+    !parsed.reviewerNextStep
+  ) {
+    throw new Error("Gemma returned an incomplete signal audit");
+  }
+
+  return {
+    source: "Gemma API",
+    thresholdReason: parsed.thresholdReason,
+    uncertainty: parsed.uncertainty,
+    missingData: parsed.missingData,
+    reviewerNextStep: parsed.reviewerNextStep
+  };
 }

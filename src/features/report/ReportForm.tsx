@@ -35,17 +35,6 @@ const symptomOptions = [
   "Severe allergic reaction"
 ];
 
-const quickSymptomOptions = [
-  "Fever",
-  "Headache",
-  "Fatigue",
-  "Cough",
-  "Rash",
-  "Nausea",
-  "Diarrhea",
-  "Bite marks"
-];
-
 const privacyOptions: PrivacyLevel[] = [
   "Approximate neighborhood",
   "Exact place",
@@ -225,21 +214,6 @@ export function ReportForm({
                 ))}
               </select>
               <Plus size={17} />
-            </div>
-            <div className="chip-grid chip-grid--quick" aria-label="Common symptoms">
-              {quickSymptomOptions.map((symptom) => (
-                <button
-                  key={symptom}
-                  className={
-                    values.symptoms.includes(symptom) ? "chip chip--selected" : "chip"
-                  }
-                  type="button"
-                  onClick={() => toggleSymptom(symptom)}
-                >
-                  {values.symptoms.includes(symptom) ? <Check size={15} /> : null}
-                  {symptom}
-                </button>
-              ))}
             </div>
             <div className="selected-chip-list" aria-label="Selected symptoms">
               {values.symptoms.length === 0 ? (

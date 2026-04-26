@@ -131,6 +131,14 @@ export interface RiskFactor {
   explanation: string;
 }
 
+export interface SignalAudit {
+  source: "Gemma API" | "Mock AI";
+  thresholdReason: string;
+  uncertainty: string;
+  missingData: string;
+  reviewerNextStep: string;
+}
+
 export interface PersonalRiskResult {
   signalLevel: SignalLevel;
   score: number;
@@ -139,6 +147,7 @@ export interface PersonalRiskResult {
   nextSteps: string[];
   weather: WeatherContext;
   epydemix: EpydemixContext;
+  aiAudit: SignalAudit;
   explanationSource: "Gemini API" | "Mock AI";
 }
 

@@ -1,4 +1,10 @@
-import type { ImageCategory, LanguagePreference, UserReport } from "../../types/domain";
+import type {
+  ImageCategory,
+  LanguagePreference,
+  RiskFactor,
+  SignalAudit,
+  UserReport
+} from "../../types/domain";
 
 export function classifyImage(imageName?: string): {
   category: ImageCategory;
@@ -37,4 +43,30 @@ export function buildRiskExplanation(report: UserReport, language: LanguagePrefe
 
   if (report.language === "Spanish" || language === "Spanish") return spanish;
   return english;
+}
+
+export function buildSignalAudit(
+  report: UserReport,
+  score: number,
+  factors: RiskFactor[]
+): SignalAudit {
+  const strongestFactor =
+    [...factors].sort((a, b) => b.weight - a.weight)[0]?.label ?? "Submitted symptoms";
+  const uncertainty = report.exposureTypes.includes("Outdoor/vector")
+    ? "Weather and outdoor context can make a vector-like pattern more plausible, but they do not prove exposure or causation."
+    : "Self-reports are early signals and can include unrelated illnesses, duplicate reports, or incomplete timing.";
+  const missingData = report.exposureTypes.includes("Foodborne")
+    ? "Needs repeated onset timing, shared food-setting detail, and clinic or inspection comparison."
+    : report.exposureTypes.includes("Close-contact")
+      ? "Needs clinic or campus-health comparison before escalation."
+      : "Needs clinic, lab, vector, animal, or partner-feed comparison before public health action.";
+
+  return {
+    source: "Mock AI",
+    thresholdReason: `${strongestFactor} is the strongest model driver behind the ${score}/100 signal.`,
+    uncertainty,
+    missingData,
+    reviewerNextStep:
+      "Keep the signal in human review, compare against partner data if the pattern repeats, and avoid public claims from a single report."
+  };
 }

@@ -67,6 +67,7 @@ spotsignal-az/
 The prototype now includes live adapters with mock fallback:
 
 - Gemini API for optional image categorization and calm risk explanations.
+- Gemma model audit pass for threshold reason, uncertainty, missing data, and reviewer next step when configured.
 - NOAA/National Weather Service API for forecast context by Arizona place coordinates.
 - Epydemix GitHub data for Arizona demographic structure and contact matrices by setting.
 
@@ -75,9 +76,10 @@ Create a local `.env.local` file and add a Google AI Studio key:
 ```txt
 VITE_GEMINI_API_KEY=your_key_here
 VITE_GEMINI_MODEL=gemini-3-flash-preview
+VITE_GEMMA_MODEL=gemma-4-31b-it
 ```
 
-NOAA/NWS does not require an API key. If Gemini or NOAA is unavailable, SpotSignal falls back to local mock services so the demo keeps working.
+NOAA/NWS does not require an API key. If Gemini, Gemma, or NOAA is unavailable, SpotSignal falls back to local mock services so the demo keeps working.
 
 Epydemix data is fetched from the public `epistorm/epydemix-data` GitHub repository. SpotSignal currently uses `United_States_Arizona` `mistry_2021` contact matrices for home, work, school, community, and all-setting contact context. If the fetch fails, the app uses a local contact-pattern fallback.
 

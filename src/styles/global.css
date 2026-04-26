@@ -1101,6 +1101,66 @@ button:focus-visible {
   line-height: 1.5;
 }
 
+.gemma-audit {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid #d6e6e1;
+  border-radius: 8px;
+  background:
+    linear-gradient(135deg, rgba(246, 252, 250, 0.96), rgba(255, 255, 255, 0.88)),
+    var(--surface);
+}
+
+.gemma-audit__header {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  color: var(--primary-strong);
+}
+
+.gemma-audit__header span {
+  display: block;
+  color: var(--primary-strong);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.gemma-audit__header strong {
+  color: var(--ink);
+  font-size: 0.95rem;
+}
+
+.gemma-audit-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.gemma-audit-grid article {
+  display: grid;
+  gap: 6px;
+  min-height: 112px;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: rgba(237, 246, 243, 0.56);
+}
+
+.gemma-audit-grid span {
+  color: var(--primary-strong);
+  font-size: 0.76rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.gemma-audit-grid p {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
 .signal-trace-sources {
   display: flex;
   flex-wrap: wrap;
@@ -2751,15 +2811,6 @@ button:focus-visible {
   animation: calmBackdropIn 220ms ease-out both;
 }
 
-.calm-fluid-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  cursor: crosshair;
-  opacity: 0.78;
-}
-
 .calm-panel {
   position: relative;
   z-index: 1;
@@ -2819,18 +2870,48 @@ button:focus-visible {
   text-align: center;
 }
 
-.calm-visual > :not(.calm-sensory-canvas) {
+.calm-visual > :not(.calm-orbit) {
   position: relative;
   z-index: 1;
 }
 
-.calm-sensory-canvas {
+.calm-orbit {
   position: absolute;
   inset: 0;
   z-index: 0;
-  width: 100%;
-  height: 100%;
-  cursor: crosshair;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.calm-orbit span {
+  position: absolute;
+  border: 1px solid rgba(47, 143, 131, 0.22);
+  border-radius: 50%;
+  background: rgba(221, 243, 239, 0.18);
+  animation: calmFloat 14s ease-in-out infinite;
+}
+
+.calm-orbit span:nth-child(1) {
+  top: 10%;
+  left: 14%;
+  width: 110px;
+  height: 110px;
+}
+
+.calm-orbit span:nth-child(2) {
+  right: 12%;
+  bottom: 14%;
+  width: 150px;
+  height: 150px;
+  animation-delay: 2200ms;
+}
+
+.calm-orbit span:nth-child(3) {
+  top: 48%;
+  left: 42%;
+  width: 78px;
+  height: 78px;
+  animation-delay: 4200ms;
 }
 
 .calm-visual::after {
@@ -2966,6 +3047,40 @@ button:focus-visible {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
+}
+
+.calm-bot-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: center;
+  padding: 13px;
+  border: 1px solid #cde3dc;
+  border-radius: 8px;
+  background: var(--surface-soft);
+}
+
+.calm-bot-card__avatar {
+  display: grid;
+  width: 46px;
+  height: 46px;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--surface);
+  color: var(--primary-strong);
+  box-shadow: inset 0 0 0 1px rgba(47, 143, 131, 0.16);
+}
+
+.calm-bot-card span {
+  color: var(--primary-strong);
+  font-size: 0.78rem;
+  font-weight: 900;
+  text-transform: uppercase;
+}
+
+.calm-bot-card p {
+  margin-top: 3px;
+  font-weight: 750;
 }
 
 .calm-meaning-box article {
@@ -3116,6 +3231,19 @@ button:focus-visible {
   }
 }
 
+@keyframes calmFloat {
+  0%,
+  100% {
+    opacity: 0.42;
+    transform: translate3d(0, 0, 0) scale(0.96);
+  }
+
+  50% {
+    opacity: 0.78;
+    transform: translate3d(10px, -12px, 0) scale(1.04);
+  }
+}
+
 .review-icon,
 .model-card-section__icon {
   display: grid;
@@ -3205,6 +3333,7 @@ button:focus-visible {
     .home-intelligence-strip,
     .intake-boundary,
     .signal-trace-grid,
+    .gemma-audit-grid,
     .flow-meter {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -3287,6 +3416,7 @@ button:focus-visible {
     .intake-boundary,
     .signal-trace-grid,
     .signal-trace--compact .signal-trace-grid,
+    .gemma-audit-grid,
     .flow-meter {
     grid-template-columns: 1fr;
   }

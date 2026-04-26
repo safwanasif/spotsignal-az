@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import {
+  Bot,
   CheckCircle2,
   HeartPulse,
   LifeBuoy,
@@ -8,7 +9,6 @@ import {
   Wind,
   X
 } from "lucide-react";
-import { CalmFluidCanvas } from "./CalmFluidCanvas";
 
 interface CalmConnectOverlayProps {
   onClose: () => void;
@@ -21,9 +21,17 @@ const breathPhases = [
 ];
 
 const groundingSteps = [
-  "Name one thing you can see.",
-  "Relax your shoulders and unclench your jaw.",
-  "Read the signal explanation before assuming the worst."
+  "Name one neutral thing you can see near you.",
+  "Drop your shoulders and let your jaw rest.",
+  "Read the uncertainty before deciding what the signal means.",
+  "Choose one next step, not five."
+];
+
+const calmingPrompts = [
+  "Look at the ring and let your breathing set the pace.",
+  "A signal is information. It is not a verdict.",
+  "The strongest public health action here is careful review.",
+  "You can pause. The app will still be here."
 ];
 
 export function CalmConnectOverlay({ onClose }: CalmConnectOverlayProps) {
@@ -41,6 +49,9 @@ export function CalmConnectOverlay({ onClose }: CalmConnectOverlayProps) {
       return isActive;
     }) ?? breathPhases[0];
   const resetProgress = Math.min(Math.round((elapsed / 60) * 100), 100);
+  const groundingStep = groundingSteps[Math.min(Math.floor(elapsed / 15), groundingSteps.length - 1)];
+  const calmingPrompt =
+    calmingPrompts[Math.min(Math.floor(elapsed / 15), calmingPrompts.length - 1)];
 
   useEffect(() => {
     const timer = window.setInterval(() => {
@@ -52,7 +63,6 @@ export function CalmConnectOverlay({ onClose }: CalmConnectOverlayProps) {
 
   return (
     <div className="calm-overlay" role="dialog" aria-modal="true" aria-labelledby="calm-title">
-      <CalmFluidCanvas className="calm-fluid-canvas" />
       <div className="calm-panel">
         <button className="calm-close" type="button" onClick={onClose} aria-label="Close CalmConnect">
           <X size={18} />
@@ -60,7 +70,11 @@ export function CalmConnectOverlay({ onClose }: CalmConnectOverlayProps) {
 
         <div className="calm-layout">
           <div className="calm-visual">
-            <CalmFluidCanvas className="calm-sensory-canvas" />
+            <div className="calm-orbit" aria-hidden="true">
+              <span />
+              <span />
+              <span />
+            </div>
             <div className="breath-ring" aria-label={`Breathing prompt: ${activePhase.label}`}>
               <Wind size={34} />
               <span>{activePhase.label}</span>
@@ -73,7 +87,7 @@ export function CalmConnectOverlay({ onClose }: CalmConnectOverlayProps) {
               Follow the ring. The goal is not to ignore the signal; it is to respond from a steadier
               place.
             </p>
-            <span className="calm-interaction-hint">Move your cursor for soft ripples.</span>
+            <span className="calm-interaction-hint">{calmingPrompt}</span>
           </div>
 
           <div className="calm-copy">
@@ -83,6 +97,16 @@ export function CalmConnectOverlay({ onClose }: CalmConnectOverlayProps) {
               SpotSignal is an early-warning context layer. It can flag patterns for review, but it
               does not diagnose you, blame a place, or declare an outbreak.
             </p>
+
+            <div className="calm-bot-card">
+              <div className="calm-bot-card__avatar">
+                <Bot size={24} />
+              </div>
+              <div>
+                <span>CalmConnect guide</span>
+                <p>{calmingPrompt}</p>
+              </div>
+            </div>
 
             <div className="calm-meaning-box">
               <article>
@@ -109,7 +133,7 @@ export function CalmConnectOverlay({ onClose }: CalmConnectOverlayProps) {
           <article>
             <Sparkles size={18} />
             <span>Grounding check</span>
-            <p>{groundingSteps[elapsed % groundingSteps.length]}</p>
+            <p>{groundingStep}</p>
           </article>
           <article>
             <ShieldCheck size={18} />
@@ -129,7 +153,7 @@ export function CalmConnectOverlay({ onClose }: CalmConnectOverlayProps) {
         </div>
 
         <small className="calm-credit">
-          Fluid backdrop inspired by Pavel Dobryakov's open-source WebGL simulation.
+          CalmConnect gives steady prompts only. It does not replace medical or emergency care.
         </small>
       </div>
     </div>

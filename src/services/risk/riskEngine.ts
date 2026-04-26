@@ -1,8 +1,8 @@
 import { communityTrends } from "../../data/mockTrends";
 import { getPlaceById } from "../../data/places";
 import { scoreToSignal } from "../../lib/signal";
-import { generateRiskExplanation, classifyReportImage } from "../ai/aiService";
-import { buildRiskExplanation, classifyImage } from "../ai/mockAi";
+import { generateRiskExplanation, classifyReportImage, generateSignalAudit } from "../ai/aiService";
+import { buildRiskExplanation, buildSignalAudit, classifyImage } from "../ai/mockAi";
 import {
   getEpydemixContext,
   getLocalEpydemixFallback
@@ -131,6 +131,7 @@ export function calculatePersonalRisk(
     ],
     weather,
     epydemix,
+    aiAudit: buildSignalAudit(report, score, factors),
     explanationSource
   };
 }
@@ -152,13 +153,18 @@ export async function buildRiskAssessment(values: ReportFormValues): Promise<{
     weather,
     report.language
   );
+  const riskWithExplanation: PersonalRiskResult = {
+    ...baseRisk,
+    explanation: aiExplanation.explanation,
+    explanationSource: aiExplanation.source
+  };
+  const aiAudit = await generateSignalAudit(report, riskWithExplanation);
 
   return {
     report,
     risk: {
-      ...baseRisk,
-      explanation: aiExplanation.explanation,
-      explanationSource: aiExplanation.source
+      ...riskWithExplanation,
+      aiAudit
     }
   };
 }
